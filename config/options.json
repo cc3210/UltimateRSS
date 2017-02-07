@@ -1,0 +1,16 @@
+var options = {
+	site : {
+		url : "https://www.voyagespirates.fr/feed"
+		filter : {
+			field : "title"
+			value : "ERREUR DE PRIX"
+			}
+	}
+}
+
+
+
+
+
+export.module = options
+
