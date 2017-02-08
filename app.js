@@ -10,6 +10,8 @@ const fs = require('fs');
 const jsonfile = require('jsonfile');
 
 var feedparser = new FeedParser();
+var fileName = './links.json';
+var file = require(fileName);
 
 // create reusable transporter object using the default SMTP transport
 let transporter = nodemailer.createTransport({
@@ -20,20 +22,13 @@ let transporter = nodemailer.createTransport({
     }
 });
 
+
 // setup email data with unicode symbols
 let mailOptions = {
     from: 'cyril.tupinier@gmail.com', // sender address
     to: 'cyril.tupinier@yahoo.fr', // list of receivers
     subject: 'ERREUR DE PRIX - VOYAGE PIRATES', // Subject line
 };
-
-if ( !fs.existsSync('./links.txt')) {
-	fs.writeFile('./links.txt', '', (err) => {
-	  if (err) throw err;
-		  console.log('It\'s saved!');
-	})
-}
-
 
 req.on('error', function (error) {
   // handle any request errors 
@@ -59,18 +54,25 @@ feedparser.on('readable', function () {
   var stream = this; // `this` is `feedparser`, which is a stream 
   var meta = this.meta; // **NOTE** the "meta" is always available in the context of the feedparser instance 
   var item;
-  var alreadyDone;
+	
+console.log("Execute script treatment")
 
   while (item = stream.read()) {
     if ($(item.title).include('ERREUR DE PRIX')) {
 	
-	var jsonData = jsonfile.readFileSync('./links.json');
-	console.log(jsonData);
+	console.log(item.url);
+	if (!file.url.includes(item.link)) {
+		file.url.push(item.link);
+		console.log(file.url);
 
-	
-//fs.appendFileSync('./links.txt',item.link+"\n");
+		fs.writeFile(fileName, JSON.stringify(file), function (err) {
+  			if (err) return console.log(err);
+			  console.log(JSON.stringify(file));
+			  console.log('writing to ' + fileName);
+		});
+	}
 
-        mailOptions.html = "<b>"+item.title+"<b> <br/> <a href="+item.link+"> Lien </a>";
+  /*      mailOptions.html = "<b>"+item.title+"<b> <br/> <a href="+item.link+"> Lien </a>";
         // send mail with defined transport object
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
@@ -78,7 +80,7 @@ feedparser.on('readable', function () {
             }
             console.log('Message %s sent: %s', info.messageId, info.response);
         });
-	
+*/	
 
   }}
 });
