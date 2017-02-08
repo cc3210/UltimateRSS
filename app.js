@@ -4,7 +4,7 @@ var FeedParser = require('feedparser');
 var request = require('request'); // for fetching the feed 
 var $ = require('string');
 var req = request('https://www.voyagespirates.fr/feed')
-
+var moment = require('moment');
 const nodemailer = require('nodemailer');
 const fs = require('fs');
 const jsonfile = require('jsonfile');
@@ -29,6 +29,8 @@ let mailOptions = {
     to: 'cyril.tupinier@yahoo.fr', // list of receivers
     subject: 'ERREUR DE PRIX - VOYAGE PIRATES', // Subject line
 };
+
+console.log("Launch at "+moment().format());
 
 req.on('error', function (error) {
   // handle any request errors 
@@ -55,7 +57,6 @@ feedparser.on('readable', function () {
   var meta = this.meta; // **NOTE** the "meta" is always available in the context of the feedparser instance 
   var item;
 	
-console.log("Execute script treatment")
 
   while (item = stream.read()) {
     if ($(item.title).include('ERREUR DE PRIX')) {
@@ -72,7 +73,7 @@ console.log("Execute script treatment")
 		});
 	}
 
-  /*      mailOptions.html = "<b>"+item.title+"<b> <br/> <a href="+item.link+"> Lien </a>";
+        mailOptions.html = "<b>"+item.title+"<b> <br/> <a href="+item.link+"> Lien </a>";
         // send mail with defined transport object
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
@@ -80,7 +81,5 @@ console.log("Execute script treatment")
             }
             console.log('Message %s sent: %s', info.messageId, info.response);
         });
-*/	
-
   }}
 });
